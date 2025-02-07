@@ -1,0 +1,1005 @@
+meta:
+  engine: 4.1.0
+  version: 0.1
+  author: Tommy Larsson
+  github: https://github.com/larssont/Koala52
+
+# U is a predefined unit of measure that means 19.05mm, which is MX spacing (u is 19.00mm)
+units:
+  # Defaults
+  $default_spread: U
+  $default_padding: U
+
+  # Proxy Spacing Variables
+  kx: U
+  ky: U
+
+  # Keycap Variables
+  kcx: 18
+  kcy: 18
+  kcx_gap: kx - kcx
+  kcy_gap: ky - kcy
+
+  # Padding Variables
+  px: kx + kcx_gap
+  py: ky + kcy_gap
+
+  # Fillet
+  fillet_max: 2.25
+  fillet_min: 0.75
+  fillet_mcu: fillet_min
+
+  # USB-C cable dimensions
+  usb_cable_x: 13.35
+  usb_cable_ht: 7.5
+
+  # PCB
+  pcb_height: 1.6
+  pcb_edge_margin: 0.35 # JLCPCB minimum is 0.3 mm
+
+  # MCU variables for Supermini RP2040
+  mcu_usb_overhang: 1.4
+  mcu_usb_x: 9 # Measures 9 mm
+  mcu_usb_y: 7.32 # Measures 7.32
+  mcu_usb_ht: 3.15
+  mcu_smd_f_ht: 2.63
+  mcu_smd_b_ht: 1.14
+  mcu_x: 17.89
+  mcu_y: 23.5
+  mcu_pin_x: 1.65
+  mcu_pin_y: 1.65
+  mcu_pcb_ht: 1
+  mcu_pad_width: 1.5
+  mcu_inner_pad_h_length: 1.95 - pcb_edge_margin
+  mcu_inner_pad_v_length: 1.95 - pcb_edge_margin
+  mcu_outer_pad_h_length: mcu_inner_pad_h_length
+  mcu_outer_pad_v_length: mcu_inner_pad_v_length
+  mcu_inner_x: mcu_x - 2*mcu_inner_pad_h_length
+  mcu_inner_y: mcu_y - mcu_inner_pad_v_length
+  mcu_inner_cutout_x: mcu_inner_x - 2*pcb_edge_margin
+  mcu_inner_cutout_y: mcu_inner_y - 2*pcb_edge_margin
+  mcu_inner_slot_x: mcu_inner_x # No need for MoE on these two, since there's plenty of margin already
+  mcu_inner_slot_y: mcu_inner_y
+
+  # Height of MCU sides, including PCB, 0.25 mm MoE
+  mcu_b_ht: mcu_smd_b_ht + mcu_pcb_ht + 0.25
+  mcu_f_ht: mcu_smd_f_ht + mcu_pcb_ht + 0.25
+  
+  # MCU USB slot dimensions
+  mcu_usb_slot_x: usb_cable_x
+  mcu_usb_slot_ht: (usb_cable_ht - mcu_usb_ht)/2
+
+  # USB Mini interconnect
+  usb_mini_x: 9
+  usb_mini_y: 7.6
+  usb_mini_ht: 3.95
+
+  usb_mini_cable_x: 11.5 # Cable is estimated with included MoE
+  usb_mini_cable_ht: 9
+
+  # No Y dimension since the slot only cuts the wall
+  usb_mini_slot_x: usb_mini_cable_x
+  usb_mini_slot_ht: (usb_mini_cable_ht - usb_mini_ht)/2
+
+  # Piezo
+  piezo_x: 11
+  piezo_y: 9
+
+  # Mounting holes
+  mh_dia: 2.2
+  mh_clearance: 1
+  mh_total: mh_dia + 2*mh_clearance
+
+  # Hanglife M2 threaded inserts
+  insert_ht: 4 # 3 mm insert, 1 mm clearance underneath
+  insert_dia: 2.68
+  insert_standoff_dia: insert_dia + 1.5*2
+
+  # Case variables
+  # NOTE! Wall thickness > 4.29 fails due to bezier curve accuracy
+  cs_wall: 2.8
+  cs_inner_margin: 0.4 # From PCB to inner edge of case
+  cs_outer_margin: cs_inner_margin + cs_wall # From PCB to outer edge of case
+
+  # Rubber feet
+  # Bumpon 3M SJ5382
+  foot_moe: 0.2
+  foot_dia: 6.4 + foot_moe
+  foot_inset: 0.5
+  foot_margin: foot_dia/2 # Margin to edge of board
+  foot_shift: cs_outer_margin - foot_margin - foot_dia/2 
+
+  # Magsafe
+  # The plate has a margin that goes around the perimeter.
+  # This margin is slightly bigger than most MoEs since there has
+  # to be tolerance for both the 3D print and the plate itself.
+  magsafe_plate_margin: 0.4
+  magsafe_inset: foot_inset
+  magsafe_margin: foot_margin # Margin to edge of case
+
+  # Gap between PCB and case
+  # This exists to accommodate the following components
+  # Piezo KLJ-1102 -- 1.7 mm
+  # Molex 54819-0589 USB Mini-B port -- 1.8 mm
+  # Gateron Low Profile Hotswap socket -- 1.87 mm
+  # BAV70 SMD Diodes -- 1.12 mm
+  # KS33 Switches -- 3.25 mm - PCB height = 1.65 mm (assuming 1.6 mm PCB)
+  cs_gap: 2.15
+
+  # Base case height
+  # This results in a case bottom where the height is at least 1 mm thick, including spots
+  # with insets (rubber feet and magsafe plate)
+  cs_ht: 1 + max(foot_inset, magsafe_inset)
+
+  cs_insert_hole_ht: cs_ht
+  cs_standoff_ht: cs_insert_hole_ht + insert_ht
+  cs_wall_ht: cs_standoff_ht + pcb_height
+  cs_internal_ht: cs_standoff_ht - cs_gap
+
+  cs_mcu_usb_ht: cs_standoff_ht - max(0, mcu_usb_slot_ht)
+
+  cs_usb_mini_ht: cs_wall_ht - max(0, usb_mini_slot_ht)
+
+points:
+  key:
+    left_colrow: '{{left_col}}_{{row}}'
+  zones:
+    matrix:
+      anchor:
+        shift: [75, -150]
+        rotate: 0
+      columns:
+        outer:
+          key:
+            colpin: P27
+            mirror.colpin: P5
+          rows.num.skip: true
+        pinky:
+          key:
+            colpin: P9
+            left_col: outer
+            mirror.colpin: P14
+            stagger: -(1/3)ky
+        ring:
+          key:
+            colpin: P10
+            left_col: pinky
+            mirror.colpin: P12
+            stagger: 5/7ky
+        middle:
+          key:
+            colpin: P11
+            left_col: ring
+            mirror.colpin: P11
+            stagger: 1/2ky
+        index:
+          key:
+            colpin: P12
+            left_col: middle
+            mirror.colpin: P10
+            stagger: -(1/3)ky
+        inner:
+          key:
+            colpin: P13
+            left_col: index
+            mirror.colpin: P8
+            stagger: -(1/10)ky
+      rows:
+        bottom:
+          rowpin: P26
+          mirror.rowpin: P6
+        home:
+          rowpin: P15
+          mirror.rowpin: P7
+        top:
+          rowpin: P14
+          mirror.rowpin: P9
+        num:
+          rowpin: P8
+          mirror.rowpin: P13
+    thumb:
+      anchor:
+        - ref: matrix_index_bottom
+          affect: x
+          shift: 1/10kx
+        - ref: matrix_inner_bottom
+          affect: y
+          # shift: -1.25ky
+          shift: -1ky
+      columns:
+        tucky:
+          key:
+            colpin: P11
+            mirror.colpin: P11
+            name: thumb_tucky
+        middy:
+          key:
+            left_col: tucky
+            colpin: P12
+            mirror.colpin: P10
+            splay: -16
+            origin: [-0.5kx, -0.5ky]
+            name: thumb_middy
+        reachy:
+          key:
+            left_col: middy
+            colpin: P13
+            mirror.colpin: P8
+            splay: 90
+            shift: [-(1/4)kx, 0]
+            width: 3/2kx
+            name: thumb_reachy
+            tags:
+              - wide_key
+      rows:
+        cluster:
+          rowpin: P7
+          mirror.rowpin: P15
+
+    piezo:
+      anchor:
+        - ref: matrix_ring_num
+          shift: [0, (0.8ky + piezo_y)/2]
+      key:
+        name: piezo
+
+    magsafe:
+      anchor:
+        - ref: matrix_middle_home
+      key:
+        name: magsafe
+
+    # Minimum position for mcu, since top_left/top_right depends on mcu, and vice versa
+    mcu_min:
+      anchor:
+        - ref: matrix_pinky_num
+          affect: y
+          # shift: (1kcy + mcu_y)/2 + mcu_outer_pad_v_length + kcy_gap
+          shift: (1kcy + mcu_y)/2
+        - aggregate:
+            parts:
+              - ref: matrix_pinky_num
+              - ref: matrix_outer_top
+          affect: x
+      key:
+        name: mcu_min
+
+    usb_mini_min:
+      anchor:
+        - ref: matrix_inner_num
+          shift: [0, 0.5kcy + kcy_gap + usb_mini_y/2]
+      key:
+        name: usb_mini_min
+
+    pos_tr:
+      anchor:
+        - aggregate:
+            method: max
+            parts:
+              - ref: mcu_min
+                shift: [0, mcu_y/2]
+              - ref: usb_mini_min
+                shift: [0, usb_mini_y/2 + pcb_edge_margin]
+              - ref: piezo
+                shift: [0, piezo_y/2 + pcb_edge_margin]
+              - ref: matrix_middle_num
+                shift: [0, 0.5py]
+              - ref: matrix_inner_num
+                shift: [0.5px, 0.5py]
+      key:
+        name: pos_tr
+    pos_tl:
+      anchor:
+        - ref: pos_tr
+          affect: y
+        - ref: matrix_outer_top
+          affect: x
+          shift: -0.5px
+      key:
+        name: pos_tl
+    pos_bl:
+      anchor:
+        - ref: pos_tl
+          affect: x
+        - ref: matrix_outer_bottom
+          affect: y
+          shift: -0.5py
+      key:
+        name: pos_bl
+    pos_br:
+      anchor:
+        - ref: matrix_inner_bottom
+          shift: [-0.5px, -0.5py]
+      key:
+        name: pos_br
+    pos_thumb_bl:
+      anchor:
+        - aggregate:
+            method: min
+            parts:
+              - ref: matrix_index_bottom
+                shift: [-0.5px, -0.5py]
+              - ref: thumb_tucky
+                shift: [0.5px, -0.5py]
+      key:
+        name: pos_thumb_bl
+    pos_thumb_br:
+      anchor:
+        - ref: thumb_reachy
+          shift: [-0.5px, -0.5py]
+      key:
+        name: pos_thumb_br
+    pos_thumb_tr:
+      anchor:
+        - ref: thumb_reachy
+          shift: [0.55px, -0.5py] # Shifted slightly to make room for a curve in the thumb cluster
+      key:
+        name: pos_thumb_tr
+    version_text:
+      anchor:
+        - ref: matrix_outer_top
+          shift: [0, 0.5ky - 2]
+      key:
+        name: version_text
+    qr_code:
+      anchor:
+        - ref: thumb_middy
+          affect: r
+        - aggregate:
+            parts:
+              - ref: thumb_tucky
+              - ref: thumb_middy
+          affect: ["x", "y"]
+          shift: [0, 0.5ky - 3.25]
+      key:
+        name: qr
+
+    usb_mini:
+      anchor:
+        - ref: usb_mini_min
+          affect: x
+        - ref: pos_tr
+          shift: -usb_mini_y/2 - pcb_edge_margin
+          affect: y
+      key:
+        name: usb_mini
+
+    mcu:
+      anchor:
+        - ref: mcu_min
+          affect: x
+        - ref: pos_tl
+          shift: -mcu_y/2
+          affect: y
+      key:
+        name: mcu
+    mcu_inner:
+      anchor:
+        - ref: mcu
+          affect: x
+        - ref: pos_tl
+          affect: y
+          shift: -mcu_inner_y/2
+      key:
+        name: mcu_inner
+    mh_bl:
+      anchor:
+        - ref: matrix_outer_bottom
+          shift: [0.5kx, insert_standoff_dia/2 - 1.8]
+      key:
+        name: mh_bl
+    mh_br:
+      anchor:
+        - ref: matrix_index_bottom
+          shift: [0.5kx, insert_standoff_dia/2 - 1.8]
+      key:
+        name: mh_br
+    mh_thumb:
+      anchor:
+        - ref: thumb_middy
+          shift: [0.5kx, insert_standoff_dia/2 - 1.8]
+      key:
+        name: mh_thmub
+    mh_tl:
+      anchor:
+        - ref: pos_tl
+          shift: [mh_total, -mh_total]
+      key:
+        name: mh_tl
+    mh_tr:
+      anchor:
+        - ref: matrix_inner_num
+          shift: [-0.5kx, 0.5ky - insert_standoff_dia/2]
+      key:
+        name: mh_tr
+    mh_mr:
+      anchor:
+        - aggregate:
+            parts:
+              - ref: matrix_middle_home
+                shift: [0, -0.5ky]
+              - ref: matrix_index_top
+      key:
+        name: mh_mr
+    mh_ml:
+      anchor:
+        - aggregate:
+            parts:
+              - ref: matrix_pinky_top
+                shift: [0, -0.5ky]
+              - ref: matrix_ring_top
+      key:
+        name: mh_ml
+    foot_tl:
+      anchor:
+        - ref: pos_tl
+          shift: [-foot_shift, foot_shift]
+      key:
+        name: foot_tl
+    foot_tr:
+      anchor:
+        - ref: pos_tr
+          shift: foot_shift
+      key:
+        name: foot_tr
+    foot_tm:
+      anchor:
+        - aggregate:
+            parts:
+              - ref: pos_tr
+              - ref: pos_tl
+          shift: [0, foot_shift]
+      key:
+        name: foot_tm
+    foot_bl:
+      anchor:
+        - ref: pos_bl
+          shift: -foot_shift
+      key:
+        name: foot_bl
+    foot_thumb_l:
+      anchor:
+        - ref: pos_thumb_bl
+          shift: -foot_shift
+      key:
+        name: foot_thumb_l
+    foot_thumb_r:
+      anchor:
+        - ref: pos_thumb_br
+          shift: -foot_shift
+      key:
+        name: foot_thumb_r
+  mirror: &mirror
+    ref: matrix_inner_num
+    distance: 5kx
+
+outlines:
+  matrix_area_right:
+    $extends: outlines.matrix_area_left
+    $args: ["mirror_"]
+  matrix_area_left:
+    $params: [<mirror>]
+    $args: [""]
+    area:
+      what: rectangle
+      where: 
+        - [/^<mirror>matrix_.*/]
+      size: [px, py]
+
+  keys_right:
+    $extends: outlines.keys_left
+    $args: [mirror_]
+  keys_left:
+    $params: [<mirror>]
+    $args: [""]
+    kx_keys:
+      what: rectangle
+      where:
+        - [/^((<mirror>)(thumb|matrix)_.*)/]
+      size: [kx-0.5,ky-0.5]
+    1_5kx_keys:
+      what: rectangle
+      where: 
+        - [/^((<mirror>)(thumb|matrix)_.*)/, wide_key]
+      size: [1.5kx-0.5,ky-0.5]
+  thumb_area_right:
+    $extends: outlines.thumb_area_left
+    $args: [mirror_, right]
+  thumb_area_left:
+    $params: [<mirror>, <side>]
+    $args: ["", "left"]
+    cluster:
+      what: polygon
+      points:
+        - ref: <mirror>matrix_inner_home
+          shift: [0.5px, 0]
+        - ref: <mirror>matrix_inner_bottom
+          shift: [0.5px, 0py]
+          bezier:
+            type: quadratic
+            accuracy: 0.11
+        # Control point
+        - aggregate:
+            method: intersect
+            parts:
+              - ref: <mirror>matrix_inner_bottom
+                shift: [0.5px, 0]
+              - ref: <mirror>pos_thumb_tr
+        - ref: <mirror>pos_thumb_tr
+          shift: [0, 1/3py]
+        - ref: <mirror>pos_thumb_tr
+        - ref: <mirror>pos_thumb_br
+        - ref: <mirror>pos_thumb_br
+          shift: [0, 2/5py]
+          bezier: 
+            type: cubic
+            accuracy: 0.1
+        - aggregate:
+            method: intersect
+            parts:
+              - ref: <mirror>pos_thumb_br
+              - ref: <mirror>thumb_middy
+        - aggregate:
+            method: intersect
+            parts:
+              - ref: <mirror>thumb_middy
+                shift: 0.5px
+              - ref: <mirror>pos_thumb_bl
+                rotate: 90
+          shift: [0, 1]
+        - ref: <mirror>pos_thumb_bl
+          shift: [2*fillet_max, 0]
+        - ref: <mirror>pos_thumb_bl
+        - ref: <mirror>matrix_index_bottom
+          affect: y
+
+  _mcu_inner_cutout_right:
+    $extends: outlines._mcu_inner_cutout_left
+    $args: ["mirror_"]
+  _mcu_inner_cutout_left:
+    $params: [<mirror>]
+    $args: [""]
+    cutout:
+      what: rectangle
+      where: <mirror>mcu_inner
+      size:
+        - mcu_inner_cutout_x
+        - mcu_inner_cutout_y + 100
+      adjust.shift: [0, 50] # Shifted up to compensate for y size +100
+
+  _mcu_usb_right:
+    $extends: outlines._mcu_usb_left
+    $args: ["mirror_"]
+  _mcu_usb_left:
+    $params: [<mirror>]
+    $args: [""]
+    cutout:
+      what: rectangle
+      where: <mirror>mcu
+      size:
+        - mcu_usb_slot_x
+        - 100
+      adjust.shift: [0, mcu_y/2 + cs_inner_margin + 50]
+  
+  _usb_mini_right:
+    $extends: outlines._usb_mini_left
+    $args: ["mirror_"]
+  _usb_mini_left:
+    $params: [<mirror>]
+    $args: [""]
+    cutout:
+      what: rectangle
+      where: 
+        - ref: <mirror>usb_mini
+          affect: x
+        - ref: <mirror>pos_tr
+          affect: y
+          shift: cs_inner_margin
+      size:
+        - usb_mini_slot_x
+        - 100
+      adjust.shift: [0, 50] # Shifted up to compensate for y size +100
+
+  _foot_slots_right:
+    $args: ["mirror_"]
+    $extends: outlines._foot_slots_left
+  _foot_slots_left:
+    $params: [<mirror>]
+    $args: [""]
+    slots:
+      what: circle
+      radius: foot_dia/2
+      where: /^((<mirror>)(foot)_.*)/
+
+  _top_extension_right:
+    $extends: outlines._top_extension_left
+    $args: [mirror_]
+  _top_extension_left:
+    $params: [<mirror>]
+    $args: [""]
+    extension: 
+      what: polygon
+      points:
+        - ref: <mirror>pos_tr
+        - ref: <mirror>matrix_inner_home
+          affect: y
+        - ref: <mirror>pos_tl
+          affect: x
+        - ref: <mirror>pos_tl
+          affect: y
+
+  _empty:
+    - what: rectangle
+
+  board_right:
+    $extends: outlines.board_left
+    $args: [right]
+  board_left:
+    $params: [<side>]
+    $args: [left]
+    top:
+      what: outline
+      name: _top_extension_<side>
+    thumb:
+      what: outline
+      name: thumb_area_<side>
+    matrix:
+      what: outline
+      name: matrix_area_<side>
+    expand_1:
+      what: outline
+      name: _empty
+      expand: 0
+      joints: pointy
+    expand_2:
+      what: outline
+      name: _empty
+      expand: 0
+      joints: pointy
+    fillet_max:
+      what: outline
+      name: _empty
+      fillet: fillet_max
+    fillet_min:
+      what: outline
+      name: _empty
+      fillet: fillet_min
+
+  case_inner_right:
+    $extends: outlines.board_right
+    expand_1.expand: -fillet_max
+    expand_2.expand: fillet_max + cs_inner_margin
+
+  case_inner_left:
+    $extends: outlines.board_left
+    expand_1.expand: -fillet_max
+    expand_2.expand: fillet_max + cs_inner_margin
+
+  case_outer_right:
+    $extends: outlines.board_right
+    expand_1.expand: -fillet_max
+    expand_2.expand: fillet_max + cs_outer_margin
+  case_outer_left:
+    $extends: outlines.board_left
+    expand_1.expand: -fillet_max
+    expand_2.expand: fillet_max + cs_outer_margin
+
+  pcb_right:
+    $extends: outlines.pcb_left
+    $args: [right]
+  pcb_left:
+    $params: [<side>]
+    $args: [left]
+    board:
+      what: outline
+      name: board_<side>
+    mcu:
+      what: outline
+      name: _mcu_inner_cutout_<side>
+      operation: subtract
+      fillet: fillet_mcu
+
+  _void_right:
+    $extends: outlines._void_left
+    $args: [mirror_, right]
+  _void_left:
+    $params: [<mirror>, <side>]
+    $args: ["", left]
+    rect:
+      what: rectangle
+      size: [1000, 1000]
+      where: <mirror>matrix_middle_home
+    board:
+      what: outline
+      name: case_outer_<side>
+      operation: subtract
+
+  proto_left:
+    - name: board_left
+    - name: keys_left
+      operation: stack
+  proto_right:
+    - name: board_right
+    - name: keys_right
+      operation: stack
+  proto:
+    - name: proto_left
+    - name: proto_right
+      operation: stack
+
+  _standoffs_insert_right:
+    $extends: outlines._standoffs_insert_left
+    $args: [mirror_]
+  _standoffs_insert_left:
+    $params: [<mirror>]
+    $args: [""]
+    insert:
+      what: circle
+      radius: insert_dia/2
+      where: /^<mirror>(mh)_.*/
+  _standoffs_base_right:
+    $extends: outlines._standoffs_base_left
+    $args: [mirror_, right]
+  _standoffs_base_left:
+    $params: [<mirror>, <side>]
+    $args: ["", left]
+    standoffs:
+      what: circle
+      radius: insert_standoff_dia/2
+      where: /^<mirror>(mh)_.*/
+    inserts:
+      what: outline
+      name: _standoffs_insert_<side>
+      operation: subtract
+
+  _magsafe_inset_right:
+    $extends: outlines._magsafe_inset_left
+    $args: [mirror_, right]
+  _magsafe_inset_left:
+    $params: [<mirror>, <side>]
+    $args: ["", left]
+    sheet: 
+      what: polygon
+      fillet: fillet_max
+      points:
+        - ref: <mirror>foot_tl
+          shift: [-foot_dia/2, -foot_dia/2 - magsafe_margin]
+        - ref: <mirror>matrix_inner_num
+          affect: x
+          shift: 0.5px + cs_outer_margin - magsafe_margin
+        - ref: <mirror>matrix_middle_bottom
+          shift: -0.5py - cs_outer_margin + magsafe_margin
+          affect: y
+        - ref: <mirror>foot_tl
+          shift: [-foot_dia/2, -foot_dia/2 - magsafe_margin]
+          affect: x
+
+  # For manufacturing the steel magsafe plate
+  # NOTE! The plate needs to be of ferrous metal/alloy such as mild steel (most stainless steels are less ferrous)
+  magsafe_plate:
+    plate:
+      what: outline
+      name: _magsafe_inset_left
+      expand: -magsafe_plate_margin
+
+cases:
+  magsafe_plate:
+    plate:
+      name: magsafe_plate
+      extrude: 0.8
+  case_right:
+    $args: [right]
+    $extends: cases.case_left
+  case_left:
+    $params: [<side>]
+    $args: [left]
+    wall_outer:
+      name: case_outer_<side>
+      extrude: cs_wall_ht
+      operation: add
+    wall_inner:
+      name: case_inner_<side>
+      extrude: cs_wall_ht
+      operation: subtract
+    usb_mini_sub:
+      name: _usb_mini_<side>
+      extrude: 1000
+      operation: subtract
+    usb_mini_add:
+      name: _usb_mini_<side>
+      extrude: cs_usb_mini_ht
+      operation: add
+    bottom:
+      name: case_outer_<side>
+      extrude: cs_internal_ht
+      operation: add
+    standoffs_base:
+      name: _standoffs_base_<side>
+      extrude: cs_standoff_ht
+      operation: add
+    standoffs_insert_sub:
+      name: _standoffs_insert_<side>
+      extrude: 1000
+      operation: subtract
+    standoffs_insert_add:
+      name: _standoffs_insert_<side>
+      extrude: cs_insert_hole_ht
+      operation: add
+    mcu_usb_sub:
+      name: _mcu_usb_<side>
+      extrude: 1000
+      operation: subtract
+    mcu_usb_add:
+      name: _mcu_usb_<side>
+      extrude: cs_mcu_usb_ht
+      operation: add
+    foot_slots:
+      name: _foot_slots_<side>
+      extrude: foot_inset
+      operation: subtract
+    magsafe:
+      name: _magsafe_inset_<side>
+      extrude: magsafe_inset
+      operation: subtract
+    void:
+      name: _void_<side>
+      extrude: 1000
+      operation: subtract
+
+pcbs:
+  koala52_right:
+    $args: [right, "mirror_"]
+    $extends: pcbs.koala52_left
+    footprints:
+      koala.params.mirrored: true
+      piezo.params:
+        swap_nets: true
+      switch.params:
+        swap_nets: true
+      switch_thumb.params:
+        swap_nets: false
+      diode.params:
+        swap_nets: true
+      diode_middy.params:
+        swap_nets: true
+      usb_mini.params:
+          DMIN: P1
+          DPLUS: P0
+
+
+  koala52_left:
+    $params: [<side>, <mirror>]
+    $args: [left, ""]
+    template: kicad8
+    outlines:
+      main:
+        outline: pcb_<side>
+    footprints:
+      point_debugger:
+        what: ceoloide/utility_point_debugger
+        where: true
+        params:
+          enabled: false
+      copper_fill:
+        what: ceoloide/utility_filled_zone
+        params:
+          name: Copper Fill
+          priority: 1
+          remove_islands: always
+          fill_type: solid
+          net: GND
+      version_text:
+        what: text
+        where:
+          - ref: <mirror>version_text
+        params:
+          side: B
+          face: Cascadia Mono
+          text: Koala52 v0.1\nby Tommy Larsson
+          mirrored: true
+      koala:
+        what: koala
+        where:
+          - ref: <mirror>version_text
+            shift: [0.5, 6.5]
+        params:
+          side: B
+      mounting_hole:
+        what: mh_npth
+        where: 
+          - /^<mirror>(mh)_.*/
+        params:
+          hole_size: mh_dia
+          hole_drill: mh_dia
+          clearance: mh_clearance
+          keepout_size: insert_standoff_dia
+      piezo:
+        what: piezo
+        where:
+          - ref: <mirror>piezo
+        adjust:
+          rotate: 0
+        params:
+          side: "B"
+          reversible: false
+          A: P2
+          B: GND
+      switch:
+        what: ceoloide/switch_gateron_ks27_ks33
+        where: 
+          - 
+            - /^<mirror>(matrix|thumb)_.*/
+            - -/^<mirror>thumb_(middy|reachy)/
+        params: &switch
+          to: "{{colrow}}"
+          from: "{{colpin}}"
+          outer_pad_width_front: 2.2
+          outer_pad_width_back: 2.2
+          reversible: false
+          include_centerhole_net: true
+          CENTERHOLE: GND
+          side: "B"
+          hotswap: true
+          solder: false
+          include_keycap: false
+          include_corner_marks: true
+          include_socket_silks: true
+      switch_thumb:
+        what: ceoloide/switch_gateron_ks27_ks33
+        where: 
+          - /^<mirror>thumb_(middy|reachy)/
+        params:
+          <<: *switch
+          swap_nets: true
+      diode:
+        what: bav70
+        where: 
+          - /^<mirror>matrix_(pinky|middle|inner)_.*/
+          - <mirror>thumb_tucky
+        params: &diode
+          side: "B"
+          A1: "<mirror>{{left_colrow}}"
+          A2: "{{colrow}}"
+          C: "{{rowpin}}"
+        adjust:
+          shift: [0, 0.3ky]
+      diode_middy:
+        what: bav70
+        where: 
+          - <mirror>thumb_middy
+        params:
+          <<: *diode
+          A1: <mirror>middy_cluster
+          A2: <mirror>reachy_cluster
+        adjust:
+          shift: [0, 0.3ky]
+      mcu:
+        what: rp-2040-smd
+        where:
+          - ref: <mirror>mcu
+        params:
+          side: "B"
+          width: mcu_x
+          height: mcu_y
+          inner_pad_h_length: mcu_inner_pad_h_length
+          inner_pad_v_length: mcu_inner_pad_v_length
+          outer_pad_h_length: mcu_outer_pad_h_length
+          outer_pad_v_length: mcu_outer_pad_v_length
+          pad_width: mcu_pad_width
+          oval: true
+          flip: false
+          reversible: false
+          via: false
+          via_inner: true
+          silkscreen_text: false
+      usb_mini:
+        what: usb_mini_b
+        where:
+          - ref: <mirror>usb_mini
+        params:
+          side: F
+          VBUS: V5
+          DMIN: P0
+          DPLUS: P1
+          ID: _ID
+          GND: GND
