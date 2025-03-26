@@ -1,8 +1,8 @@
 meta:
   engine: 4.1.0
   name: Koala52
-  version: 0.1
-  description: &description "Koala52 v0.1\\nby Tommy Larsson"
+  version: 0.1.0
+  description: &description "Koala52 v0.1.0\\nby Tommy Larsson"
   author: Tommy Larsson
   github: https://github.com/larssont/Koala52
 
