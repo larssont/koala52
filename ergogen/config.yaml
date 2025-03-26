@@ -1,6 +1,8 @@
 meta:
   engine: 4.1.0
+  name: Koala52
   version: 0.1
+  description: &description "Koala52 v0.1\\nby Tommy Larsson"
   author: Tommy Larsson
   github: https://github.com/larssont/Koala52
 
@@ -9,14 +11,17 @@ units:
   # Defaults
   $default_spread: U
   $default_padding: U
+  $default_width: u-1
+  $default_height: u-1
 
   # Proxy Spacing Variables
-  kx: U
-  ky: U
+  kx: $default_spread
+  ky: $default_padding
 
-  # Keycap Variables
-  kcx: 18
-  kcy: 18
+  kcx: $default_width
+  kcy: $default_height
+
+  # Keycap gaps
   kcx_gap: kx - kcx
   kcy_gap: ky - kcy
 
@@ -226,8 +231,8 @@ points:
             colpin: P13
             mirror.colpin: P8
             splay: 90
-            shift: [-(1/4)kx, 0]
-            width: 3/2kx
+            shift: [-0.25kcx, 0]
+            width: 1.5kcx
             name: thumb_reachy
             tags:
               - wide_key
@@ -502,6 +507,7 @@ outlines:
       where: 
         - [/^((<mirror>)(thumb|matrix)_.*)/, wide_key]
       size: [1.5kcx,kcy]
+
   thumb_area_right:
     $extends: outlines.thumb_area_left
     $args: [mirror_, right]
@@ -682,6 +688,7 @@ outlines:
     $extends: outlines.board_right
     expand_1.expand: -fillet_max
     expand_2.expand: fillet_max + cs_outer_margin
+    
   case_outer_left:
     $extends: outlines.board_left
     expand_1.expand: -fillet_max
@@ -717,18 +724,18 @@ outlines:
       name: case_outer_<side>
       operation: subtract
 
-  proto_left:
-    - name: board_left
-    - name: keys_left
-      operation: stack
-  proto_right:
-    - name: board_right
-    - name: keys_right
-      operation: stack
-  proto:
-    - name: proto_left
-    - name: proto_right
-      operation: stack
+  # proto_left:
+  #   - name: board_left
+  #   - name: keys_left
+  #     operation: stack
+  # proto_right:
+  #   - name: board_right
+  #   - name: keys_right
+  #     operation: stack
+  # proto:
+  #   - name: proto_left
+  #   - name: proto_right
+  #     operation: stack
 
   _standoffs_insert_right:
     $extends: outlines._standoffs_insert_left
@@ -784,6 +791,166 @@ outlines:
       what: outline
       name: _magsafe_inset_left
       expand: -magsafe_plate_margin
+
+pcbs:
+  koala52_right:
+    $args: [right, "mirror_"]
+    $extends: pcbs.koala52_left
+    footprints:
+      koala.params.mirrored: true
+      piezo.params:
+        swap_nets: true
+      switch.params:
+        to: "{{colpin}}"
+        from: "{{colrow}}"
+      switch_thumb.params:
+        to: "{{colrow}}"
+        from: "{{colpin}}"
+      diode.params:
+        swap_nets: true
+      diode_middy.params:
+        swap_nets: true
+      usb_mini.params:
+          DMIN: P1
+          DPLUS: P0
+
+  koala52_left:
+    $params: [<side>, <mirror>]
+    $args: [left, ""]
+    template: kicad8
+    outlines:
+      main:
+        outline: pcb_<side>
+    footprints:
+      point_debugger:
+        what: ceoloide/utility_point_debugger
+        where: true
+        params:
+          enabled: false
+      copper_fill:
+        what: ceoloide/utility_filled_zone
+        params:
+          name: Copper Fill
+          priority: 1
+          remove_islands: always
+          fill_type: solid
+          net: GND
+      version_text:
+        what: text
+        where:
+          - ref: <mirror>version_text
+        params:
+          side: B
+          face: Cascadia Mono
+          text: *description
+          mirrored: true
+      koala:
+        what: koala
+        where:
+          - ref: <mirror>version_text
+            shift: [0.5, 6.5]
+        params:
+          side: B
+      mounting_hole:
+        what: mh_npth
+        where: 
+          - /^<mirror>(mh)_.*/
+        params:
+          hole_size: mh_dia
+          hole_drill: mh_dia
+          clearance: mh_clearance
+          keepout_size: insert_standoff_dia
+      piezo:
+        what: piezo
+        where:
+          - ref: <mirror>piezo
+        adjust:
+          rotate: 0
+        params:
+          side: "B"
+          reversible: false
+          A: P2
+          B: GND
+      switch:
+        what: ceoloide/switch_gateron_ks27_ks33
+        where: 
+          - 
+            - /^<mirror>(matrix|thumb)_.*/
+            - -/^<mirror>thumb_(middy|reachy)/
+        params: &switch
+          to: "{{colrow}}"
+          from: "{{colpin}}"
+          outer_pad_width_front: 2.2
+          outer_pad_width_back: 2.2
+          reversible: false
+          include_centerhole_net: true
+          CENTERHOLE: GND
+          side: "B"
+          hotswap: true
+          solder: false
+          include_keycap: false
+          include_corner_marks: true
+          include_socket_silks: true
+      switch_thumb:
+        what: ceoloide/switch_gateron_ks27_ks33
+        where: 
+          - /^<mirror>thumb_(middy|reachy)/
+        params:
+          <<: *switch
+          from: "{{colrow}}"
+          to: "{{colpin}}"
+      diode:
+        what: bav70
+        where: 
+          - /^<mirror>matrix_(pinky|middle|inner)_(num|top|home|bottom)/
+          - <mirror>thumb_tucky
+        params: &diode_params
+          side: "B"
+          A1: "<mirror>{{left_colrow}}"
+          A2: "{{colrow}}"
+          C: "{{rowpin}}"
+        adjust: &diode_adj
+          shift: [0, 0.3ky]
+      diode_middy:
+        what: bav70
+        where: 
+          - <mirror>thumb_middy
+        params:
+          <<: *diode_params
+          A1: <mirror>middy_cluster
+          A2: <mirror>reachy_cluster
+        adjust:
+          <<: *diode_adj
+      mcu:
+        what: rp-2040-smd
+        where:
+          - ref: <mirror>mcu
+        params:
+          side: "B"
+          width: mcu_x
+          height: mcu_y
+          inner_pad_h_length: mcu_inner_pad_h_length
+          inner_pad_v_length: mcu_inner_pad_v_length
+          outer_pad_h_length: mcu_outer_pad_h_length
+          outer_pad_v_length: mcu_outer_pad_v_length
+          pad_width: mcu_pad_width
+          oval: true
+          flip: false
+          reversible: false
+          via: false
+          via_inner: true
+          silkscreen_text: false
+      usb_mini:
+        what: usb_mini_b
+        where:
+          - ref: <mirror>usb_mini
+        params:
+          side: F
+          VBUS: V5
+          DMIN: P0
+          DPLUS: P1
+          ID: _ID
+          GND: GND
 
 cases:
   magsafe_plate:
@@ -848,161 +1015,3 @@ cases:
       name: _void_<side>
       extrude: 1000
       operation: subtract
-
-pcbs:
-  koala52_right:
-    $args: [right, "mirror_"]
-    $extends: pcbs.koala52_left
-    footprints:
-      koala.params.mirrored: true
-      piezo.params:
-        swap_nets: true
-      switch.params:
-        swap_nets: true
-      switch_thumb.params:
-        swap_nets: false
-      diode.params:
-        swap_nets: true
-      diode_middy.params:
-        swap_nets: true
-      usb_mini.params:
-          DMIN: P1
-          DPLUS: P0
-
-
-  koala52_left:
-    $params: [<side>, <mirror>]
-    $args: [left, ""]
-    template: kicad8
-    outlines:
-      main:
-        outline: pcb_<side>
-    footprints:
-      point_debugger:
-        what: ceoloide/utility_point_debugger
-        where: true
-        params:
-          enabled: false
-      copper_fill:
-        what: ceoloide/utility_filled_zone
-        params:
-          name: Copper Fill
-          priority: 1
-          remove_islands: always
-          fill_type: solid
-          net: GND
-      version_text:
-        what: text
-        where:
-          - ref: <mirror>version_text
-        params:
-          side: B
-          face: Cascadia Mono
-          text: Koala52 v0.1\nby Tommy Larsson
-          mirrored: true
-      koala:
-        what: koala
-        where:
-          - ref: <mirror>version_text
-            shift: [0.5, 6.5]
-        params:
-          side: B
-      mounting_hole:
-        what: mh_npth
-        where: 
-          - /^<mirror>(mh)_.*/
-        params:
-          hole_size: mh_dia
-          hole_drill: mh_dia
-          clearance: mh_clearance
-          keepout_size: insert_standoff_dia
-      piezo:
-        what: piezo
-        where:
-          - ref: <mirror>piezo
-        adjust:
-          rotate: 0
-        params:
-          side: "B"
-          reversible: false
-          A: P2
-          B: GND
-      switch:
-        what: ceoloide/switch_gateron_ks27_ks33
-        where: 
-          - 
-            - /^<mirror>(matrix|thumb)_.*/
-            - -/^<mirror>thumb_(middy|reachy)/
-        params: &switch
-          to: "{{colrow}}"
-          from: "{{colpin}}"
-          outer_pad_width_front: 2.2
-          outer_pad_width_back: 2.2
-          reversible: false
-          include_centerhole_net: true
-          CENTERHOLE: GND
-          side: "B"
-          hotswap: true
-          solder: false
-          include_keycap: false
-          include_corner_marks: true
-          include_socket_silks: true
-      switch_thumb:
-        what: ceoloide/switch_gateron_ks27_ks33
-        where: 
-          - /^<mirror>thumb_(middy|reachy)/
-        params:
-          <<: *switch
-          swap_nets: true
-      diode:
-        what: bav70
-        where: 
-          - /^<mirror>matrix_(pinky|middle|inner)_.*/
-          - <mirror>thumb_tucky
-        params: &diode
-          side: "B"
-          A1: "<mirror>{{left_colrow}}"
-          A2: "{{colrow}}"
-          C: "{{rowpin}}"
-        adjust:
-          shift: [0, 0.3ky]
-      diode_middy:
-        what: bav70
-        where: 
-          - <mirror>thumb_middy
-        params:
-          <<: *diode
-          A1: <mirror>middy_cluster
-          A2: <mirror>reachy_cluster
-        adjust:
-          shift: [0, 0.3ky]
-      mcu:
-        what: rp-2040-smd
-        where:
-          - ref: <mirror>mcu
-        params:
-          side: "B"
-          width: mcu_x
-          height: mcu_y
-          inner_pad_h_length: mcu_inner_pad_h_length
-          inner_pad_v_length: mcu_inner_pad_v_length
-          outer_pad_h_length: mcu_outer_pad_h_length
-          outer_pad_v_length: mcu_outer_pad_v_length
-          pad_width: mcu_pad_width
-          oval: true
-          flip: false
-          reversible: false
-          via: false
-          via_inner: true
-          silkscreen_text: false
-      usb_mini:
-        what: usb_mini_b
-        where:
-          - ref: <mirror>usb_mini
-        params:
-          side: F
-          VBUS: V5
-          DMIN: P0
-          DPLUS: P1
-          ID: _ID
-          GND: GND
