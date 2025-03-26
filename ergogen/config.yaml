@@ -326,7 +326,7 @@ points:
     pos_thumb_br:
       anchor:
         - ref: thumb_reachy
-          shift: [-0.5px, -0.5py]
+          shift: [-0.55px, -0.5py] # Shifted slightly to make room for a curve in the thumb cluster
       key:
         name: pos_thumb_br
     pos_thumb_tr:
@@ -496,18 +496,22 @@ outlines:
       what: rectangle
       where:
         - [/^((<mirror>)(thumb|matrix)_.*)/]
-      size: [kx-0.5,ky-0.5]
+      size: [kcx,kcy]
     1_5kx_keys:
       what: rectangle
       where: 
         - [/^((<mirror>)(thumb|matrix)_.*)/, wide_key]
-      size: [1.5kx-0.5,ky-0.5]
+      size: [1.5kcx,kcy]
   thumb_area_right:
     $extends: outlines.thumb_area_left
     $args: [mirror_, right]
   thumb_area_left:
     $params: [<mirror>, <side>]
     $args: ["", "left"]
+    # The bezier curves in this outline are somewhat unstable. They rely on very high precision (low accuracy = more points),
+    # and the placement of the points will have an effect on what accuracy is needed for a functioning outline.
+    # If anything is changed in regards to points contained by the bezier curves, and the outline is longer closed, mess around with the bezier curves to
+    # see if that could solve the problem.
     cluster:
       what: polygon
       points:
@@ -517,8 +521,7 @@ outlines:
           shift: [0.5px, 0py]
           bezier:
             type: quadratic
-            accuracy: 0.11
-        # Control point
+            accuracy: 0.04
         - aggregate:
             method: intersect
             parts:
@@ -533,7 +536,7 @@ outlines:
           shift: [0, 2/5py]
           bezier: 
             type: cubic
-            accuracy: 0.1
+            accuracy: 0.04
         - aggregate:
             method: intersect
             parts:
