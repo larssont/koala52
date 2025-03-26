@@ -1,7 +1,8 @@
 Write-Host "Compiling Koala52..."
 $lastLine = ""
+$cli = "D:\Dev\Projects\ergogen\src\cli.js"
 
-node ..\src\cli.js . 2>&1 | ForEach-Object { 
+node $cli --debug . 2>&1 | ForEach-Object { 
     Write-Host $_  # Print output
     if ($_ -match "\S") { $lastLine = $_ }  # Store non-empty last line
 }
