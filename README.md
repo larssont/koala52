@@ -34,14 +34,17 @@ Inspiration was derived from various keyboards, most notably the [IK Keyboard](h
 
 Contrary to many newer smaller split ergo keyboards, I decided to retain the fourth row to have a dedicated number row. This was primarily done to make it more suitable for gaming, since many games rely on the number row for switching between different items. If I wasn't playing games regularly, I would probably ditch the number row.
 
-I've also decided to forego the common OLED screen, instead opting to have a dedicated piezo speaker on each half. I made this choice since, based on my experience, the screen provides little value to a typist that normally doesn't look at their keyboard (not to mention that most screens tend to be far too small, nor do they function well with heavy tenting). They can however be visually pleasing, but my priority was a pragmatic design first and foremost.
+I've also decided to forego the common OLED screen, opting instead for a dedicated piezo speaker on each half. I made this choice because, based on my experience, the screen provides little value to a typist that normally doesn't look at their keyboard. Most screens screens are also toa small to be beneficial and perform poorly with steep tenting angles. They can however be visually pleasing, but my priority was a pragmatic design first and foremost.
 
-I decided that I also needed a good tenting solution, which is why I added an inset at the bottom of the case where a ferrous metal plate can go, which in turn makes it MagSafe compatible. I considered other tenting solutions as well, but settled in the end on the MagSafe compatibility, since it combines versatility and simplicity. You aren't forced into using a tenting solution, and it can easily be adjusted based on your individual needs.
+I decided that I also needed a good tenting solution, which is why I added an inset at the bottom of the case for MagSafe compatibility. I considered other tenting solutions as well, but settled in the end on MagSafe since it combines versatility and simplicity. You aren't forced into using a tenting solution, and it can easily be adjusted based on your individual needs.
 
 ## Acknowledgements
 
 - Sandra at [The Noun Project](https://thenounproject.com/icon/koala-4724513/) for the koala icon which is used as the logo of this project.
-- [Ergogen](https://github.com/ergogen/ergogen), the keybard generator which this project is built with
+- [Ergogen](https://github.com/ergogen/ergogen), the keybard generator which this project is built with.
+- [FlatFootFox's Ergogen guide](https://flatfootfox.com/ergogen-introduction/), a great guide for getting started with ergogen.
+- [IK Keyboard](https://github.com/ianmaclarty/ik), a keyboard I drew a lot of inspiration from.
+
 ## License
 
 Distributed under the CERN-OHL-P-2.0 license. See [LICENSE.md](LICENSE.md) for more information.
