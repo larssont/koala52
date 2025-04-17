@@ -870,11 +870,6 @@ pcbs:
       main:
         outline: pcb_<side>
     footprints:
-      point_debugger:
-        what: ceoloide/utility_point_debugger
-        where: true
-        params:
-          enabled: false
       copper_fill:
         what: ceoloide/utility_filled_zone
         params:
@@ -884,7 +879,7 @@ pcbs:
           fill_type: solid
           net: GND
       version_text:
-        what: text
+        what: larssont/text
         where:
           - ref: <mirror>version_text
         params:
@@ -900,7 +895,7 @@ pcbs:
         params:
           side: B
       mounting_hole:
-        what: mh_npth
+        what: larssont/mh_npth
         where: 
           - /^<mirror>(mh)_.*/
         params:
@@ -909,7 +904,7 @@ pcbs:
           clearance: mh_clearance
           keepout_size: insert_standoff_dia
       piezo:
-        what: piezo
+        what: larssont/piezo
         where:
           - ref: <mirror>piezo
         adjust:
@@ -948,7 +943,7 @@ pcbs:
           from: "{{colrow}}"
           to: "{{colpin}}"
       diode:
-        what: bav70
+        what: larssont/bav70
         where: 
           - /^<mirror>matrix_(pinky|middle|inner)_(num|top|home|bottom)/
           - <mirror>thumb_tucky
@@ -960,7 +955,7 @@ pcbs:
         adjust: &diode_adj
           shift: [0, 0.3ky]
       diode_middy:
-        what: bav70
+        what: larssont/bav70
         where: 
           - <mirror>thumb_middy
         params:
@@ -970,7 +965,7 @@ pcbs:
         adjust:
           <<: *diode_adj
       mcu:
-        what: rp-2040-smd
+        what: larssont/rp2040_smd
         where:
           - ref: <mirror>mcu
         params:
@@ -989,7 +984,7 @@ pcbs:
           via_inner: true
           silkscreen_text: false
       usb_mini:
-        what: usb_mini_b
+        what: larssont/usb_mini_b
         where:
           - ref: <mirror>usb_mini
         params:
