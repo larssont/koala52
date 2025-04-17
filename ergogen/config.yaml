@@ -82,9 +82,10 @@ units:
   usb_mini_cable_x: 11.5 # Cable is estimated with included MoE
   usb_mini_cable_ht: 9
 
-  # No Y dimension since the slot only cuts the wall
-  usb_mini_slot_x: usb_mini_cable_x
+  usb_mini_slot_x: max(usb_mini_cable_x, usb_mini_x + 0.8) # 0.4 mm MoE each side
+  usb_mini_slot_y: usb_mini_y + 0.8
   usb_mini_slot_ht: (usb_mini_cable_ht - usb_mini_ht)/2
+  usb_mini_fillet: 0.85 # Matches the pads' corner radii
 
   # Piezo
   piezo_x: 11
@@ -142,8 +143,16 @@ units:
   cs_internal_ht: cs_standoff_ht - cs_gap
 
   cs_mcu_usb_ht: cs_standoff_ht - max(0, mcu_usb_slot_ht)
-
   cs_usb_mini_ht: cs_wall_ht - max(0, usb_mini_slot_ht)
+
+  # Switch plate
+  plate_ht: 2.6 # 2.5 mm is needed for KS33 switches, but 2.6 mm is good practice
+  plate_sw_x: 14
+  plate_sw_y: 14
+  plate_sw_z: 1.2
+  plate_sw_big_x: 14.7 + 0.3 # 0.3 mm MoE, 0.15 mm each side
+  plate_sw_big_y: plate_sw_y
+  plate_pcb_gap: plate_ht - plate_sw_z
 
 points:
   key:
@@ -575,6 +584,7 @@ outlines:
         - mcu_inner_cutout_x
         - mcu_inner_cutout_y + 100
       adjust.shift: [0, 50] # Shifted up to compensate for y size +100
+      fillet: fillet_mcu
 
   _mcu_usb_right:
     $extends: outlines._mcu_usb_left
@@ -600,14 +610,11 @@ outlines:
       what: rectangle
       where: 
         - ref: <mirror>usb_mini
-          affect: x
-        - ref: <mirror>pos_tr
-          affect: y
-          shift: cs_inner_margin
       size:
         - usb_mini_slot_x
-        - 100
+        - usb_mini_slot_y + 100
       adjust.shift: [0, 50] # Shifted up to compensate for y size +100
+      fillet: usb_mini_fillet
 
   _foot_slots_right:
     $args: ["mirror_"]
@@ -694,6 +701,48 @@ outlines:
     expand_1.expand: -fillet_max
     expand_2.expand: fillet_max + cs_outer_margin
 
+  _plate_right:
+    $extends: outlines._plate_left
+    $args: [mirror_, right]
+  _plate_left:
+    $params: [<mirror>, <side>]
+    $args: ["", left]
+    outer:
+      what: outline
+      name: case_outer_<side>
+    mh:
+      what: circle
+      radius: mh_dia/2
+      where: 
+        - /^<mirror>(mh)_.*/
+      operation: subtract
+    switch:
+      what: rectangle
+      size: [plate_sw_x, plate_sw_y]
+      where:
+        - [/^((<mirror>)(thumb|matrix)_.*)/]
+      operation: subtract
+    usb_mini:
+      what: outline
+      name: _usb_mini_<side>
+      operation: subtract
+    mcu:
+      what: outline
+      name: _mcu_inner_cutout_<side>
+      operation: subtract
+
+  _plate_gap_right:
+    $extends: outlines._plate_gap_left
+    $args: [mirror_, right]
+  _plate_gap_left: 
+    $params: [<mirror>, <side>]
+    $args: ["", left]
+    switch:
+      what: rectangle
+      size: [plate_sw_big_x, plate_sw_big_y]
+      where:
+        - [/^((<mirror>)(thumb|matrix)_.*)/]
+
   pcb_right:
     $extends: outlines.pcb_left
     $args: [right]
@@ -707,7 +756,6 @@ outlines:
       what: outline
       name: _mcu_inner_cutout_<side>
       operation: subtract
-      fillet: fillet_mcu
 
   _void_right:
     $extends: outlines._void_left
@@ -957,10 +1005,24 @@ cases:
     plate:
       name: magsafe_plate
       extrude: 0.8
-  case_right:
+  case_top_right:
     $args: [right]
-    $extends: cases.case_left
-  case_left:
+    $extends: cases.case_top_left
+  case_top_left:
+    $params: [<side>]
+    $args: [left]
+    plate:
+      name: _plate_<side>
+      extrude: plate_ht
+      operation: add
+    gap:
+      name: _plate_gap_<side>
+      extrude: plate_pcb_gap
+      operation: subtract
+  case_bottom_right:
+    $args: [right]
+    $extends: cases.case_bottom_left
+  case_bottom_left:
     $params: [<side>]
     $args: [left]
     wall_outer:
