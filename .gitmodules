@@ -4,3 +4,6 @@
 [submodule "ergogen/footprints/larssont"]
 	path = ergogen/footprints/larssont
 	url = https://github.com/larssont/ergogen-footprints.git
+[submodule "ergogen/utils/larssont"]
+	path = ergogen/utils/larssont
+	url = https://github.com/larssont/ergogen-utils.git
