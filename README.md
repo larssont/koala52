@@ -41,9 +41,9 @@ I decided that I also needed a good tenting solution, which is why I added an in
 ## Acknowledgements
 
 - Sandra at [The Noun Project](https://thenounproject.com/icon/koala-4724513/) for the koala icon which is used as the logo of this project.
-- [Ergogen](https://github.com/ergogen/ergogen), the keybard generator which this project is built with.
-- [FlatFootFox's Ergogen guide](https://flatfootfox.com/ergogen-introduction/), a great guide for getting started with ergogen.
-- [IK Keyboard](https://github.com/ianmaclarty/ik), a keyboard I drew a lot of inspiration from.
+- [Ergogen](https://github.com/ergogen/ergogen) — the keybard generator which this project is built with.
+- [FlatFootFox's Ergogen guide](https://flatfootfox.com/ergogen-introduction/) — a great guide for getting started with ergogen.
+- [IK Keyboard](https://github.com/ianmaclarty/ik) — a keyboard I drew a lot of inspiration from.
 
 ## License
 
