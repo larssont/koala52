@@ -81,6 +81,7 @@ units:
 
   # USB Mini interconnect
   usb_mini_x: 9
+  usb_mini_y: 7.2
   usb_mini_ht: 3.95
 
   usb_mini_cable_x: 11.5 # Cable is estimated with included MoE
