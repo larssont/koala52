@@ -9,7 +9,7 @@
   <h3 align="center">Koala52</h3>
 
   <p align="center">
-    A low profile split ergonomic keyboard with aggressive column stagger and magsafe compatibility.
+    A low profile split ergonomic keyboard with aggressive column stagger and MagSafe compatibility.
   </p>
 </p>
 
@@ -22,8 +22,8 @@
 - Piezo speakers
 - SMD mounted Supermini RP2040s
 - USB Mini-B interconnect
-- Insets for [3M SJ5382](https://www.3m.com/3M/en_US/p/d/b5005035200/) bumpons
-- Inset for metal plate for MagSafe compatibility
+- Recessed [3M SJ5382](https://www.3m.com/3M/en_US/p/d/b5005035200/) bumpons
+- Recessed MagSafe ring for tenting
 
 ## Background
 Koala52 was designed to be a versatile yet simple keyboard.
@@ -36,7 +36,7 @@ Contrary to many newer smaller split ergo keyboards, I decided to retain the fou
 
 I've also decided to forego the common OLED screen, opting instead for a dedicated piezo speaker on each half. I made this choice because, based on my experience, the screen provides little value to a typist that normally doesn't look at their keyboard. Most screens screens are also toa small to be beneficial and perform poorly with steep tenting angles. They can however be visually pleasing, but my priority was a pragmatic design first and foremost.
 
-I decided that I also needed a good tenting solution, which is why I added an inset at the bottom of the case for MagSafe compatibility. I considered other tenting solutions as well, but settled in the end on MagSafe since it combines versatility and simplicity. You aren't forced into using a tenting solution, and it can easily be adjusted based on your individual needs.
+I also needed a good tenting solution, which is why I added a recess at the bottom of the case to accommodate a MagSafe ring. I considered other tenting solutions as well, but settled in the end on MagSafe since it combines versatility and simplicity. You aren't forced into using a tenting solution, and it can easily be adjusted based on your individual needs.
 
 ## Acknowledgements
 
