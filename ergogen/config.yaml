@@ -11,23 +11,28 @@ units:
   # Defaults
   $default_spread: U
   $default_padding: U
-  $default_width: u-1
-  $default_height: u-1
+  $default_width: 18
+  $default_height: 18
 
   # Proxy Spacing Variables
   kx: $default_spread
   ky: $default_padding
 
-  kcx: $default_width
-  kcy: $default_height
+  # Private variables for a 1u keycap width/height, not meant to be used apart from here
+  # because keycap dimensions are based on key spacing, rather than
+  # a straight multiple of a 1u keycap.
+  # E.g. a 1u keycap is 18 mm, but a 1.5u keycap is 27.525 if the spacing is 19.05
+  __kcx: $default_width
+  __kcy: $default_height
 
   # Keycap gaps
-  kcx_gap: kx - kcx
-  kcy_gap: ky - kcy
+  dx: kx - __kcx
+  dy: ky - __kcy
 
   # Padding Variables
-  px: kx + kcx_gap
-  py: ky + kcy_gap
+  # Padding can be any value, but I chose to match it with the spacing between the keycaps for consistency.
+  px: kx + dx
+  py: ky + dy
 
   # Fillet
   fillet_max: 2.25
@@ -76,7 +81,7 @@ units:
 
   # USB Mini interconnect
   usb_mini_x: 9
-  usb_mini_y: 7.6
+  usb_mini_y: 7.2
   usb_mini_ht: 3.95
 
   usb_mini_cable_x: 11.5 # Cable is estimated with included MoE
@@ -237,11 +242,11 @@ points:
             colpin: P13
             mirror.colpin: P8
             splay: 90
-            shift: [-0.25kcx, 0]
-            width: 1.5kcx
+            shift: [-0.25kx, 0]
+            width: 1.5kx - dx
             name: thumb_reachy
             tags:
-              - wide_key
+              - w_1_5u
       rows:
         cluster:
           rowpin: P7
@@ -257,8 +262,7 @@ points:
       anchor:
         - ref: matrix_pinky_num
           affect: y
-          # shift: (1kcy + mcu_y)/2 + mcu_outer_pad_v_length + kcy_gap
-          shift: (1kcy + mcu_y)/2
+          shift: (ky + dy + mcu_y)/2
         - aggregate:
             parts:
               - ref: matrix_pinky_num
@@ -267,7 +271,7 @@ points:
     usb_mini_min:
       anchor:
         - ref: matrix_inner_num
-          shift: [0, 0.5kcy + kcy_gap + usb_mini_y/2]
+          shift: [0, (ky + dy + usb_mini_y)/2]
 
     pos_tr:
       anchor:
@@ -440,16 +444,25 @@ outlines:
   keys_left:
     $params: [<mirror>]
     $args: [""]
-    kx_keys:
+    1u:
       what: rectangle
       where:
-        - [/^((<mirror>)(thumb|matrix)_.*)/]
-      size: [kcx,kcy]
-    1_5kx_keys:
+        # Filter out any key which is not 1u
+        - [/^((<mirror>)(thumb|matrix)_.*)/, "-/^([wh])_([1-9])(_\\d{1,2})?(u)/"]
+      size: [kx - dx, ky - dy]
+      operation: stack
+    w_1_25u:
       what: rectangle
-      where: 
-        - [/^((<mirror>)(thumb|matrix)_.*)/, wide_key]
-      size: [1.5kcx,kcy]
+      where:
+        - [/^((<mirror>)(thumb|matrix)_.*)/, w_1_25u]
+      size: [1.25kx - dx, ky - dy]
+      operation: stack
+    w_1_5u:
+      what: rectangle
+      where:
+        - [/^((<mirror>)(thumb|matrix)_.*)/, w_1_5u]
+      size: [1.5kx - dx, ky - dy]
+      operation: stack
 
   thumb_area_right:
     $extends: outlines.thumb_area_left
@@ -485,7 +498,7 @@ outlines:
           shift: [0, 2/5py]
           bezier: 
             type: cubic
-            accuracy: 0.04
+            accuracy: 0.08
         - aggregate:
             method: intersect
             parts:
