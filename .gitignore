@@ -17,6 +17,6 @@
 .history
 .ionide
 
-# Ergogen output
-
+# Ergogen
 ergogen/output/
+ergogen/backups/
