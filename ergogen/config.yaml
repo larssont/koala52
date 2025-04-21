@@ -122,8 +122,8 @@ units:
   # Magsafe
   magsafe_recess: 0.4
   magsafe_moe: 0.2
-  magsafe_inner_diameter: 45 - magsafe_moe
-  magsafe_outer_diameter: 55 + magsafe_moe
+  magsafe_inner_dia: 45 - magsafe_moe
+  magsafe_outer_dia: 55 + magsafe_moe
 
   # Required gap between PCB and case to ensure clearance for the tallest components:
   # - Piezo KLJ-1102:                     1.80 mm
@@ -793,11 +793,11 @@ outlines:
     outer: 
       what: circle
       where: <mirror>magsafe
-      radius: magsafe_outer_diameter/2
+      radius: magsafe_outer_dia/2
     inner:
       what: circle
       where: <mirror>magsafe
-      radius: magsafe_inner_diameter/2
+      radius: magsafe_inner_dia/2
       operation: stack
 
 pcbs:
