@@ -44,21 +44,18 @@ units:
   usb_cable_ht: 7.5
 
   # PCB
-  pcb_height: 1.6
+  pcb_z: 1.6
   pcb_edge_margin: 0.35 # JLCPCB minimum is 0.3 mm
 
   # MCU variables for Supermini RP2040
   mcu_usb_overhang: 1.4
   mcu_usb_x: 9 # Measures 9 mm
   mcu_usb_y: 7.32 # Measures 7.32
-  mcu_usb_ht: 3.15
-  mcu_smd_f_ht: 2.63
-  mcu_smd_b_ht: 1.14
+  mcu_usb_z: 3.16
   mcu_x: 17.89
   mcu_y: 23.5
   mcu_pin_x: 1.65
   mcu_pin_y: 1.65
-  mcu_pcb_ht: 1
   mcu_pad_width: 1.5
   mcu_inner_pad_h_length: 1.95 - pcb_edge_margin
   mcu_inner_pad_v_length: 1.95 - pcb_edge_margin
@@ -70,27 +67,28 @@ units:
   mcu_inner_cutout_y: mcu_inner_y - 2*pcb_edge_margin
   mcu_inner_slot_x: mcu_inner_x # No need for MoE on these two, since there's plenty of margin already
   mcu_inner_slot_y: mcu_inner_y
-
-  # Height of MCU sides, including PCB, 0.25 mm MoE
-  mcu_b_ht: mcu_smd_b_ht + mcu_pcb_ht + 0.25
-  mcu_f_ht: mcu_smd_f_ht + mcu_pcb_ht + 0.25
   
-  # MCU USB slot dimensions
-  mcu_usb_slot_x: usb_cable_x
-  mcu_usb_slot_ht: (usb_cable_ht - mcu_usb_ht)/2
+  mcu_usb_front_moe: 0.4 # 0.4 mm MoE each side
+  mcu_usb_front_x: mcu_usb_x + 2*mcu_usb_front_moe
+  mcu_usb_front_y: mcu_usb_y + 2*mcu_usb_front_moe
+  mcu_usb_front_z: mcu_usb_z + 2*mcu_usb_front_moe
+  mcu_usb_front_corner: 1.2
+
+  mcu_upper_recess_top_margin: 4.13
+  mcu_upper_recess_x: mcu_inner_x
+  mcu_upper_recess_y: mcu_inner_y - mcu_upper_recess_top_margin
+  mcu_upper_recess_z: 2.7 - pcb_z + 0.25 # Tallest component is 2.7 mm, 0.25 mm MoE
 
   # USB Mini interconnect
   usb_mini_x: 9
   usb_mini_y: 7.2
-  usb_mini_ht: 3.95
+  usb_mini_z: 3.95
 
-  usb_mini_cable_x: 11.5 # Cable is estimated with included MoE
-  usb_mini_cable_ht: 9
-
-  usb_mini_slot_x: max(usb_mini_cable_x, usb_mini_x + 0.8) # 0.4 mm MoE each side
-  usb_mini_slot_y: usb_mini_y + 0.8
-  usb_mini_slot_ht: (usb_mini_cable_ht - usb_mini_ht)/2
+  usb_mini_moe: 0.25 # Low MoE because the footprint's pads are wider than the connector.
   usb_mini_fillet: 0.85 # Matches the pads' corner radii
+
+  usb_mini_cutout_x: usb_mini_x + 2*usb_mini_moe
+  usb_mini_cutout_y: usb_mini_y + 2*usb_mini_moe
 
   # Piezo
   piezo_x: 11
@@ -102,14 +100,15 @@ units:
   mh_total: mh_dia + 2*mh_clearance
 
   # Hanglife M2 threaded inserts
-  insert_ht: 4 # 3 mm insert, 1 mm clearance underneath
+  insert_z: 4 # 3 mm insert, 1 mm clearance underneath
   insert_dia: 2.68
   insert_standoff_dia: insert_dia + 1.5*2
 
   # Case variables
   # NOTE! Wall thickness > 4.29 fails due to bezier curve accuracy
-  cs_wall: 2.8
-  cs_inner_margin: 0.4 # From PCB to inner edge of case
+  cs_wall: 2.4
+  cs_comp_wall: 1.2
+  cs_inner_margin: 0.3 # From PCB to inner edge of case
   cs_outer_margin: cs_inner_margin + cs_wall # From PCB to outer edge of case
 
   # Rubber feet
@@ -123,30 +122,28 @@ units:
   # Magsafe
   magsafe_recess: 0.4
   magsafe_moe: 0.2
-  magsafe_inner_diameter: 45 - magsafe_moe
-  magsafe_outer_diameter: 55 + magsafe_moe
+  magsafe_inner_dia: 45 - magsafe_moe
+  magsafe_outer_dia: 55 + magsafe_moe
 
-  # Gap between PCB and case
-  # This exists to accommodate the following components
-  # Piezo KLJ-1102 -- 1.7 mm
-  # Molex 54819-0589 USB Mini-B port -- 1.8 mm
-  # Gateron Low Profile Hotswap socket -- 1.87 mm
-  # BAV70 SMD Diodes -- 1.12 mm
-  # KS33 Switches -- 3.25 mm - PCB height = 1.65 mm (assuming 1.6 mm PCB)
-  cs_gap: 2.15
+  # Required gap between PCB and case to ensure clearance for the tallest components:
+  # - Piezo KLJ-1102:                     1.80 mm
+  # - Molex 54819-0589 (USB Mini-B):      1.80 mm
+  # - Gateron LP Hotswap Socket:          1.87 mm
+  # - BAV70 SMD Diode:                    1.12 mm
+  # - KS33 Switch:                        3.25 mm total height → minus PCB thickness
+  #
+  # Determine the tallest component above the PCB surface:
+  comp_max_z: max(1.87, 3.25 - pcb_z)
 
-  # Base case height
-  # Ensures the case bottom has a minimum thickness of 1 mm,
+  # Gap = tallest component + 0.25 mm margin, rounded up to nearest 0.05 mm
+  cs_gap: ceil((comp_max_z + 0.25) / 0.05) * 0.05
+
+  # Minimum case height
+  # Ensures that the case bottom has a minimum thickness of at least 0.8 mm,
   # while accounting for recessed areas (e.g., rubber feet and MagSafe).
-  cs_ht: 1 + max(foot_recess, magsafe_recess)
-
-  cs_insert_hole_ht: cs_ht
-  cs_standoff_ht: cs_insert_hole_ht + insert_ht
-  cs_wall_ht: cs_standoff_ht + pcb_height
-  cs_internal_ht: cs_standoff_ht - cs_gap
-
-  cs_mcu_usb_ht: cs_standoff_ht - max(0, mcu_usb_slot_ht)
-  cs_usb_mini_ht: cs_wall_ht - max(0, usb_mini_slot_ht)
+  cs_min_z: 0.8 + max(foot_recess, magsafe_recess)
+  cs_standoff_z: cs_min_z + max(insert_z, cs_gap)
+  cs_wall_z: cs_standoff_z + pcb_z
 
   # Switch plate
   plate_ht: 2.6 # 2.5 mm is needed for KS33 switches, but 2.6 mm is good practice
@@ -252,17 +249,13 @@ points:
           rowpin: P7
           mirror.rowpin: P15
 
-    piezo:
-      anchor:
-        - ref: matrix_ring_num
-          shift: [0, (0.8ky + piezo_y)/2]
-
-    # Minimum position for mcu, since top_left/top_right depends on mcu, and vice versa
+    # Minimum position for mcu, since top_left/top_right depends on mcu, and vice versa.
+    # Y-axis depends of the size of the inner cutout because the MCU is bottom mounted.
     mcu_min:
       anchor:
         - ref: matrix_pinky_num
           affect: y
-          shift: (ky + dy + mcu_y)/2
+          shift: (ky + dy + mcu_inner_cutout_y)/2
         - aggregate:
             parts:
               - ref: matrix_pinky_num
@@ -282,8 +275,6 @@ points:
                 shift: [0, mcu_y/2]
               - ref: usb_mini_min
                 shift: [0, usb_mini_y/2 + pcb_edge_margin]
-              - ref: piezo
-                shift: [0, piezo_y/2 + pcb_edge_margin]
               - ref: matrix_middle_num
                 shift: [0, 0.5py]
               - ref: matrix_inner_num
@@ -344,6 +335,14 @@ points:
         - ref: pos_tl
           shift: -mcu_y/2
           affect: y
+    mcu_usb:
+      anchor:
+        - ref: mcu
+          shift: [0, mcu_y/2 - mcu_usb_y/2]
+    mcu_upper_recess: 
+      anchor:
+        - ref: mcu
+          shift: [0, mcu_y/2 - mcu_upper_recess_top_margin - mcu_upper_recess_y/2]
     mcu_inner:
       anchor:
         - ref: mcu
@@ -351,19 +350,15 @@ points:
         - ref: pos_tl
           affect: y
           shift: -mcu_inner_y/2
-  
-    mh_bl:
+
+    piezo:
       anchor:
-        - ref: matrix_outer_bottom
-          shift: [0.5kx, insert_standoff_dia/2 - 1.8]
-    mh_br:
-      anchor:
-        - ref: matrix_index_bottom
-          shift: [0.5kx, insert_standoff_dia/2 - 1.8]
-    mh_thumb:
-      anchor:
-        - ref: thumb_middy
-          shift: [0.5kx, insert_standoff_dia/2 - 1.8]
+        - ref: pos_tl
+          shift: -piezo_y/2 - 1
+          affect: y
+        - ref: matrix_ring_num
+          affect: x
+
     mh_tl:
       anchor:
         - ref: pos_tl
@@ -386,6 +381,18 @@ points:
               - ref: matrix_pinky_top
                 shift: [0, -0.5ky]
               - ref: matrix_ring_top
+    mh_bl:
+      anchor:
+        - ref: matrix_outer_bottom
+          shift: [0.5kx, insert_standoff_dia/2 - 1.8]
+    mh_br:
+      anchor:
+        - ref: matrix_index_bottom
+          shift: [0.5kx, insert_standoff_dia/2 - 1.8]
+    mh_thumb:
+      anchor:
+        - ref: thumb_middy
+          shift: [0.5kx, insert_standoff_dia/2 - 1.8]
 
     foot_tl:
       anchor:
@@ -533,19 +540,43 @@ outlines:
       adjust.shift: [0, 50] # Shifted up to compensate for y size +100
       fillet: fillet_mcu
 
-  _mcu_usb_right:
-    $extends: outlines._mcu_usb_left
-    $args: ["mirror_"]
-  _mcu_usb_left:
-    $params: [<mirror>]
-    $args: [""]
-    cutout:
+  _mcu_upper_recess_right:
+    $extends: outlines._mcu_upper_recess_left
+    $args: [mirror_, right]
+  _mcu_upper_recess_left:
+    $params: [<mirror>, <side>]
+    $args: ["", left]
+    slot:
       what: rectangle
-      where: <mirror>mcu
+      size: [mcu_upper_recess_x, mcu_upper_recess_y]
+      where: <mirror>mcu_upper_recess
+
+  _mcu_usb_front_inner_right:
+    $extends: outlines._mcu_usb_front_inner_left
+    $args: [mirror_, right]
+  _mcu_usb_front_inner_left:
+    $params: [<mirror>, <side>]
+    $args: ["", left]
+    inner:
+      what: rectangle
+      where:
+        - ref: <mirror>mcu_usb
+          shift: [0, -mcu_usb_front_y/2]
       size:
-        - mcu_usb_slot_x
-        - 100
-      adjust.shift: [0, mcu_y/2 + cs_inner_margin + 50]
+        - mcu_usb_front_x
+        - mcu_usb_front_z
+      corner: mcu_usb_front_corner
+
+  _mcu_usb_front_outer_right:
+    $extends: outlines._mcu_usb_front_outer_left
+    $args: [mirror_, right]
+  _mcu_usb_front_outer_left:
+    $params: [<mirror>, <side>]
+    $args: ["", left]
+    outer:
+      what: outline
+      name: _mcu_usb_front_inner_<side>
+      expand: cs_comp_wall
   
   _usb_mini_right:
     $extends: outlines._usb_mini_left
@@ -558,8 +589,8 @@ outlines:
       where: 
         - ref: <mirror>usb_mini
       size:
-        - usb_mini_slot_x
-        - usb_mini_slot_y + 100
+        - usb_mini_cutout_x
+        - usb_mini_cutout_x + 100
       adjust.shift: [0, 50] # Shifted up to compensate for y size +100
       fillet: usb_mini_fillet
 
@@ -673,10 +704,6 @@ outlines:
       what: outline
       name: _usb_mini_<side>
       operation: subtract
-    mcu:
-      what: outline
-      name: _mcu_inner_cutout_<side>
-      operation: subtract
 
   _plate_gap_right:
     $extends: outlines._plate_gap_left
@@ -719,18 +746,18 @@ outlines:
       name: case_outer_<side>
       operation: subtract
 
-  # proto_left:
-  #   - name: board_left
-  #   - name: keys_left
-  #     operation: stack
-  # proto_right:
-  #   - name: board_right
-  #   - name: keys_right
-  #     operation: stack
-  # proto:
-  #   - name: proto_left
-  #   - name: proto_right
-  #     operation: stack
+  proto_left:
+    - name: board_left
+    - name: keys_left
+      operation: stack
+  proto_right:
+    - name: board_right
+    - name: keys_right
+      operation: stack
+  proto:
+    - name: proto_left
+    - name: proto_right
+      operation: stack
 
   _standoffs_insert_right:
     $extends: outlines._standoffs_insert_left
@@ -766,11 +793,11 @@ outlines:
     outer: 
       what: circle
       where: <mirror>magsafe
-      radius: magsafe_outer_diameter/2
+      radius: magsafe_outer_dia/2
     inner:
       what: circle
       where: <mirror>magsafe
-      radius: magsafe_inner_diameter/2
+      radius: magsafe_inner_dia/2
       operation: stack
 
 pcbs:
@@ -943,61 +970,71 @@ cases:
       name: _plate_gap_<side>
       extrude: plate_pcb_gap
       operation: subtract
+    mcu_usb_front_outer:
+      name: _mcu_usb_front_outer_<side>
+      extrude: 100
+      shift: [0, -cs_comp_wall, -pcb_z + mcu_usb_z/2]
+      rotate: [-90, 0, 0]
+      operation: add
+    mcu_usb_front_inner:
+      name: _mcu_usb_front_inner_<side>
+      extrude: 100
+      shift: [0, 0, -pcb_z + mcu_usb_z/2]
+      rotate: [-90, 0, 0]
+      operation: subtract
+    mcu_recess:
+      name: _mcu_upper_recess_<side>
+      extrude: mcu_upper_recess_z
+      operation: subtract
+    clean:
+      name: _plate_<side>
+      extrude: 1000
+      operation: intersect
+
+  _bottom_recesses_right:
+    $args: [right]
+    $extends: cases._bottom_recesses_left
+  _bottom_recesses_left:
+    $params: [<side>]
+    $args: [left]
+    foot_slots:
+      name: _foot_slots_<side>
+      extrude: foot_recess
+    magsafe:
+      name: _magsafe_recess_<side>
+      extrude: magsafe_recess
+
   case_bottom_right:
     $args: [right]
     $extends: cases.case_bottom_left
   case_bottom_left:
     $params: [<side>]
     $args: [left]
-    wall_outer:
+    wall:
       name: case_outer_<side>
-      extrude: cs_wall_ht
+      extrude: cs_wall_z
       operation: add
-    wall_inner:
+    gap:
       name: case_inner_<side>
-      extrude: cs_wall_ht
+      shift: [0, 0, cs_standoff_z - cs_gap]
+      extrude: cs_wall_z
       operation: subtract
-    usb_mini_sub:
-      name: _usb_mini_<side>
-      extrude: 1000
-      operation: subtract
-    usb_mini_add:
-      name: _usb_mini_<side>
-      extrude: cs_usb_mini_ht
-      operation: add
-    bottom:
-      name: case_outer_<side>
-      extrude: cs_internal_ht
-      operation: add
     standoffs_base:
       name: _standoffs_base_<side>
-      extrude: cs_standoff_ht
+      extrude: cs_standoff_z
       operation: add
-    standoffs_insert_sub:
+    standoffs_insert:
       name: _standoffs_insert_<side>
-      extrude: 1000
+      shift: [0, 0, cs_standoff_z - insert_z]
+      extrude: insert_z
       operation: subtract
-    standoffs_insert_add:
-      name: _standoffs_insert_<side>
-      extrude: cs_insert_hole_ht
-      operation: add
-    mcu_usb_sub:
-      name: _mcu_usb_<side>
-      extrude: 1000
+    mcu_usb:
+      name: _mcu_usb_front_inner_<side>
+      extrude: 100
+      shift: [0, 0, cs_wall_z - pcb_z + mcu_usb_z/2]
+      rotate: [-90, 0, 0]
       operation: subtract
-    mcu_usb_add:
-      name: _mcu_usb_<side>
-      extrude: cs_mcu_usb_ht
-      operation: add
-    foot_slots:
-      name: _foot_slots_<side>
-      extrude: foot_recess
-      operation: subtract
-    magsafe:
-      name: _magsafe_recess_<side>
-      extrude: magsafe_recess
-      operation: subtract
-    void:
-      name: _void_<side>
-      extrude: 1000
+    recesses:
+      what: case
+      name: _bottom_recesses_<side>
       operation: subtract
